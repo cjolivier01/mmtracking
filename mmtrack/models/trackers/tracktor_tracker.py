@@ -75,11 +75,14 @@ class TracktorTracker(BaseTracker):
             0,
             self.regression['nms'],
             return_inds=True)
-        ids = ids[valid_inds]
-
+        # colivier
+        if ids.device.type == "cpu" and valid_inds.device.type == "cuda":
+            ids = ids[valid_inds.cpu()]
+        else:
+            ids = ids[valid_inds]
         valid_inds = track_bboxes[:, -1] > self.regression['obj_score_thr']
-        return track_bboxes[valid_inds], track_labels[valid_inds], ids[
-            valid_inds]
+        
+        return track_bboxes[valid_inds], track_labels[valid_inds], ids[valid_inds.cpu()]
 
     @force_fp32(apply_to=('img', 'feats'))
     def track(self,
