@@ -9,6 +9,7 @@ import torch
 from mmcv.ops import RoIPool
 from mmcv.parallel import collate, scatter
 from mmcv.runner import load_checkpoint
+from mmcv.utils.registry import dict_to_arg_string
 from mmdet.datasets.pipelines import Compose
 
 from mmtrack.models import build_model
@@ -38,6 +39,11 @@ def init_model(config,
     elif not isinstance(config, mmcv.Config):
         raise TypeError('config must be a filename or Config object, '
                         f'but got {type(config)}')
+
+    # print(dict_to_arg_string(config))
+    # print(dict_to_arg_string(config.model))
+    # print(dict_to_arg_string(config.data))
+
     if cfg_options is not None:
         config.merge_from_dict(cfg_options)
     if 'detector' in config.model:
