@@ -1,3 +1,36 @@
+_base_ = [
+    "../../_base_/datasets/coco_detection.py",
+]
+
+checkpoint_config = dict(interval=1)
+# yapf:disable
+log_config = dict(
+    interval=50,
+    hooks=[
+        dict(type='TextLoggerHook'),
+        # dict(type='TensorboardLoggerHook')
+    ])
+# yapf:enable
+custom_hooks = [dict(type='NumClassCheckHook')]
+
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+
+# disable opencv multithreading to avoid system being overloaded
+opencv_num_threads = 0
+# set multi-process start method as `fork` to speed up the training
+mp_start_method = 'fork'
+
+# Default setting for scaling LR automatically
+#   - `enable` means enable scaling LR automatically
+#       or not by default.
+#   - `base_batch_size` = (8 GPUs) x (2 samples per GPU).
+auto_scale_lr = dict(enable=False, base_batch_size=16)
+
+
 
 # Stitched panoramic video aspect ratio is about 2.4
 #detection_img_scale = (1333, 800)
@@ -132,7 +165,7 @@ dcn_detector = dict(
 #
 # The overall tracking model
 #
-model = dict(
+bytetrack_model = dict(
     detector=dcn_detector,
     type="ByteTrack",
     motion=dict(type="KalmanFilter"),
@@ -150,82 +183,85 @@ model = dict(
     ),
 )
 
-data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
-    train=dict(
-        type="CocoDataset",
-        ann_file="data/coco/annotations/instances_train2017.json",
-        img_prefix="data/coco/train2017/",
-        pipeline=[
-            dict(type="LoadImageFromFile"),
-            dict(type="LoadAnnotations", with_bbox=True),
-            dict(type="Resize", img_scale=detection_img_scale, keep_ratio=True),
-            dict(type="RandomFlip", flip_ratio=0.5),
-            dict(
-                type="Normalize",
-                mean=[123.675, 116.28, 103.53],
-                std=[58.395, 57.12, 57.375],
-                to_rgb=True,
-            ),
-            dict(type="Pad", size_divisor=32),
-            dict(type="DefaultFormatBundle"),
-            dict(type="Collect", keys=["img", "gt_bboxes", "gt_labels"]),
-        ],
-    ),
-    val=dict(
-        type="CocoDataset",
-        ann_file="data/coco/annotations/instances_val2017.json",
-        img_prefix="data/coco/val2017/",
-        pipeline=[
-            dict(type="LoadImageFromFile"),
-            dict(
-                type="MultiScaleFlipAug",
-                img_scale=detection_img_scale,
-                flip=False,
-                transforms=[
-                    dict(type="Resize", keep_ratio=True),
-                    dict(type="RandomFlip"),
-                    dict(
-                        type="Normalize",
-                        mean=[123.675, 116.28, 103.53],
-                        std=[58.395, 57.12, 57.375],
-                        to_rgb=True,
-                    ),
-                    dict(type="Pad", size_divisor=32),
-                    dict(type="ImageToTensor", keys=["img"]),
-                    dict(type="Collect", keys=["img"]),
-                ],
-            ),
-        ],
-    ),
-    test=dict(
-        type="CocoDataset",
-        ann_file="data/coco/annotations/instances_val2017.json",
-        img_prefix="data/coco/val2017/",
-        pipeline=[
-            dict(type="LoadImageFromFile"),
-            dict(
-                type="MultiScaleFlipAug",
-                img_scale=detection_img_scale,
-                flip=False,
-                transforms=[
-                    dict(type="Resize", keep_ratio=True),
-                    dict(type="RandomFlip"),
-                    dict(
-                        type="Normalize",
-                        mean=[123.675, 116.28, 103.53],
-                        std=[58.395, 57.12, 57.375],
-                        to_rgb=True,
-                    ),
-                    dict(type="Pad", size_divisor=32),
-                    dict(type="ImageToTensor", keys=["img"]),
-                    dict(type="Collect", keys=["img"]),
-                ],
-            ),
-        ],
-    ),
-)
+#model = dcn_detector
+model = bytetrack_model
+
+# data = dict(
+#     samples_per_gpu=2,
+#     workers_per_gpu=2,
+#     train=dict(
+#         type="CocoDataset",
+#         ann_file="data/coco/annotations/instances_train2017.json",
+#         img_prefix="data/coco/train2017/",
+#         pipeline=[
+#             dict(type="LoadImageFromFile"),
+#             dict(type="LoadAnnotations", with_bbox=True),
+#             dict(type="Resize", img_scale=detection_img_scale, keep_ratio=True),
+#             dict(type="RandomFlip", flip_ratio=0.5),
+#             dict(
+#                 type="Normalize",
+#                 mean=[123.675, 116.28, 103.53],
+#                 std=[58.395, 57.12, 57.375],
+#                 to_rgb=True,
+#             ),
+#             dict(type="Pad", size_divisor=32),
+#             dict(type="DefaultFormatBundle"),
+#             dict(type="Collect", keys=["img", "gt_bboxes", "gt_labels"]),
+#         ],
+#     ),
+#     val=dict(
+#         type="CocoDataset",
+#         ann_file="data/coco/annotations/instances_val2017.json",
+#         img_prefix="data/coco/val2017/",
+#         pipeline=[
+#             dict(type="LoadImageFromFile"),
+#             dict(
+#                 type="MultiScaleFlipAug",
+#                 img_scale=detection_img_scale,
+#                 flip=False,
+#                 transforms=[
+#                     dict(type="Resize", keep_ratio=True),
+#                     dict(type="RandomFlip"),
+#                     dict(
+#                         type="Normalize",
+#                         mean=[123.675, 116.28, 103.53],
+#                         std=[58.395, 57.12, 57.375],
+#                         to_rgb=True,
+#                     ),
+#                     dict(type="Pad", size_divisor=32),
+#                     dict(type="ImageToTensor", keys=["img"]),
+#                     dict(type="Collect", keys=["img"]),
+#                 ],
+#             ),
+#         ],
+#     ),
+#     test=dict(
+#         type="CocoDataset",
+#         ann_file="data/coco/annotations/instances_val2017.json",
+#         img_prefix="data/coco/val2017/",
+#         pipeline=[
+#             dict(type="LoadImageFromFile"),
+#             dict(
+#                 type="MultiScaleFlipAug",
+#                 img_scale=detection_img_scale,
+#                 flip=False,
+#                 transforms=[
+#                     dict(type="Resize", keep_ratio=True),
+#                     dict(type="RandomFlip"),
+#                     dict(
+#                         type="Normalize",
+#                         mean=[123.675, 116.28, 103.53],
+#                         std=[58.395, 57.12, 57.375],
+#                         to_rgb=True,
+#                     ),
+#                     dict(type="Pad", size_divisor=32),
+#                     dict(type="ImageToTensor", keys=["img"]),
+#                     dict(type="Collect", keys=["img"]),
+#                 ],
+#             ),
+#         ],
+#     ),
+# )
 
 
 # data = dict(
