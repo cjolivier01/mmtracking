@@ -14,6 +14,16 @@ from mmdet.datasets.pipelines import Compose
 
 from mmtrack.models import build_model
 
+def to_float_tensor(img: torch.Tensor, dtype: torch.dtype = torch.float):
+    if isinstance(img, list):
+        for i, l_img in enumerate(img):
+            img[i] = to_float_tensor(img=l_img, dtype=dtype)
+        return img
+    if isinstance(img, torch.Tensor) and not torch.is_floating_point(img):
+        assert dtype != img.dtype
+        return img.to(torch.float, non_blocking=True)
+    return img
+
 
 def init_model(config,
                checkpoint=None,
@@ -127,6 +137,7 @@ def inference_mot(model, img, frame_id):
             ), 'CPU inference with RoIPool is not supported currently.'
         # just get the actual data from DataContainer
         data['img_metas'] = data['img_metas'][0].data
+    data['img'] = to_float_tensor(data['img'])
     # forward the model
     with torch.no_grad():
         result = model(return_loss=False, rescale=True, **data)
