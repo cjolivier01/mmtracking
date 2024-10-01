@@ -7,7 +7,7 @@ from collections import defaultdict
 
 import mmcv
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets import DATASETS
 
 from mmtrack.core import eval_vis, results2outs

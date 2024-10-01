@@ -3,7 +3,7 @@ import contextlib
 import io
 from collections import OrderedDict
 
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 
 from .ytvis import YTVIS
 from .ytviseval import YTVISeval

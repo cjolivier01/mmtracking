@@ -7,7 +7,7 @@ import mmcv
 import motmetrics as mm
 import numpy as np
 from mmcv import Config
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 
 from mmtrack.core.utils import imshow_mot_errors
 from mmtrack.datasets import build_dataset

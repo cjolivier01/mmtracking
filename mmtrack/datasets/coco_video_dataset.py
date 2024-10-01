@@ -2,7 +2,7 @@
 import random
 
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets import DATASETS, CocoDataset
 from terminaltables import AsciiTable
 

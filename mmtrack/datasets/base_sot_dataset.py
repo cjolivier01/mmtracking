@@ -7,7 +7,7 @@ from io import StringIO
 import mmcv
 import numpy as np
 from addict import Dict
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets.pipelines import Compose
 from torch.utils.data import Dataset
 

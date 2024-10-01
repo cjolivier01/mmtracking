@@ -5,7 +5,7 @@ from multiprocessing import Pool
 import motmetrics as mm
 import numpy as np
 import pandas as pd
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.core.evaluation.bbox_overlaps import bbox_overlaps
 from motmetrics.lap import linear_sum_assignment
 from motmetrics.math_util import quiet_divide

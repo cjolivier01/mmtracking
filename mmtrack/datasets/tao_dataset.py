@@ -4,7 +4,7 @@ import tempfile
 
 import mmcv
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets import DATASETS
 from mmdet.datasets.api_wrappers import COCO
 

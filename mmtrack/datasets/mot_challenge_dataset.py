@@ -6,7 +6,7 @@ import tempfile
 import mmcv
 import motmetrics as mm
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.core import eval_map
 from mmdet.datasets import DATASETS
 

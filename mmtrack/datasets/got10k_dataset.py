@@ -5,7 +5,7 @@ import shutil
 import time
 
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets import DATASETS
 
 from .base_sot_dataset import BaseSOTDataset

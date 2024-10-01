@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import numpy as np
-from mmcv.utils import print_log
+from mmengine.logging import print_log
 from mmdet.datasets import DATASETS
 
 from mmtrack.core.evaluation import eval_sot_ope
