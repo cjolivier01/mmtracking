@@ -375,7 +375,8 @@ class VideoCollect(object):
                 img_meta[key] = results['img_info'][key]
         data['img_metas'] = img_meta
         for key in self.keys:
-            data[key] = results[key]
+            if key in results:
+                data[key] = results[key]
         return data
 
     def _add_default_meta_keys(self, results):

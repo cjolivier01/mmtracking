@@ -75,10 +75,15 @@ class BaseTracker(BaseModule, metaclass=ABCMeta):
         id_indice = memo_items.index('ids')
         assert 'frame_ids' in memo_items
         frame_id = int(kwargs['frame_ids'])
-        if isinstance(kwargs['frame_ids'], int):
+        if isinstance(kwargs['frame_ids'], torch.Tensor):
+            kwargs['frame_ids'] = kwargs['frame_ids'].repeat(num_objs)
+        elif isinstance(kwargs['frame_ids'], int):
             kwargs['frame_ids'] = torch.tensor([kwargs['frame_ids']] *
                                                num_objs)
-        # cur_frame_id = int(kwargs['frame_ids'][0])
+        # if isinstance(kwargs['frame_ids'], int):
+        #     kwargs['frame_ids'] = torch.tensor([kwargs['frame_ids']] *
+        #                                        num_objs)
+        #cur_frame_id = int(kwargs['frame_ids'])
         for k, v in kwargs.items():
             if len(v) != num_objs:
                 raise ValueError()

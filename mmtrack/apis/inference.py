@@ -9,9 +9,20 @@ import torch
 from mmcv.ops import RoIPool
 from mmcv.parallel import collate, scatter
 from mmcv.runner import load_checkpoint
+#from mmcv.utils.registry import dict_to_arg_string
 from mmdet.datasets.pipelines import Compose
 
 from mmtrack.models import build_model
+
+def to_float_tensor(img: torch.Tensor, dtype: torch.dtype = torch.float):
+    if isinstance(img, list):
+        for i, l_img in enumerate(img):
+            img[i] = to_float_tensor(img=l_img, dtype=dtype)
+        return img
+    if isinstance(img, torch.Tensor) and not torch.is_floating_point(img):
+        assert dtype != img.dtype
+        return img.to(torch.float, non_blocking=True)
+    return img
 
 
 def init_model(config,
@@ -38,10 +49,19 @@ def init_model(config,
     elif not isinstance(config, mmcv.Config):
         raise TypeError('config must be a filename or Config object, '
                         f'but got {type(config)}')
+
+    # print(dict_to_arg_string(config))
+    # print(dict_to_arg_string(config.model))
+    # print(dict_to_arg_string(config.data))
+
     if cfg_options is not None:
         config.merge_from_dict(cfg_options)
     if 'detector' in config.model:
         config.model.detector.pretrained = None
+    elif hasattr(config, 'detector_standalone_model'):
+        config.model.detector = config.detector_standalone_model
+        #config.model.detector.pretrained = None
+        
     model = build_model(config.model)
 
     if not verbose_init_params:
@@ -117,6 +137,7 @@ def inference_mot(model, img, frame_id):
             ), 'CPU inference with RoIPool is not supported currently.'
         # just get the actual data from DataContainer
         data['img_metas'] = data['img_metas'][0].data
+    data['img'] = to_float_tensor(data['img'])
     # forward the model
     with torch.no_grad():
         result = model(return_loss=False, rescale=True, **data)
