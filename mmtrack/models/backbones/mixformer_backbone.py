@@ -7,14 +7,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from mmtrack.core.utils.misc import ntuple
+
 from mmcv.cnn import build_norm_layer
 from mmcv.cnn.bricks.drop import DropPath
 from mmcv.cnn.bricks.transformer import FFN
 from mmcv.cnn.utils.weight_init import trunc_normal_
-from mmcv.runner import BaseModule
-from mmdet.models.builder import BACKBONES
+from mmengine import Registry
+from mmengine.model import BaseModule
 
-from mmtrack.core.utils.misc import ntuple
+BACKBONES = Registry("backbone")
 
 to_2tuple = ntuple(2)
 

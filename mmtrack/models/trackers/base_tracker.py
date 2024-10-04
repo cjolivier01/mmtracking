@@ -4,9 +4,9 @@ from abc import ABCMeta, abstractmethod
 import torch
 import torch.nn.functional as F
 from addict import Dict
-from mmcv.runner import BaseModule
-
 from mmtrack.models import TRACKERS
+
+from mmengine.model import BaseModule
 
 
 @TRACKERS.register_module()

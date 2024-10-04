@@ -3,16 +3,19 @@ import logging
 import os
 import tempfile
 
-import mmcv
 import numpy as np
 import torch
-from mmcv.ops import RoIPool
-from mmcv.parallel import collate, scatter
-from mmcv.runner import load_checkpoint
-#from mmcv.utils.registry import dict_to_arg_string
-from mmdet.datasets.pipelines import Compose
-
 from mmtrack.models import build_model
+
+import mmcv
+from mmcv.ops import RoIPool
+
+# from mmcv.utils.registry import dict_to_arg_string
+from mmcv.transforms import Compose
+
+# from mmcv.parallel import collate, scatter
+from mmengine.runner import load_checkpoint
+
 
 def to_float_tensor(img: torch.Tensor, dtype: torch.dtype = torch.float):
     if isinstance(img, list):

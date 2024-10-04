@@ -1,6 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from mmcv.cnn import MODELS as MMCV_MODELS
-from mmcv.utils import Registry
+# from mmcv.cnn import MODELS as MMCV_MODELS
+from mmengine import Registry
+from mmengine.registry import MODELS as MMCV_MODELS
 
 MODELS = Registry('models', parent=MMCV_MODELS)
 TRACKERS = MODELS
